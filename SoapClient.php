@@ -119,7 +119,7 @@ class SoapClient extends \SoapClient
         // set up type converter and mime filter
         $this->configureMime($options);
         // we want the exceptions option to be set
-        $options['exceptions'] = true;
+        //$options['exceptions'] = true;
         // disable obsolete trace option for native SoapClient as we need to do our own tracing anyways
         $options['trace'] = false;
         // disable WSDL caching as we handle WSDL caching for remote URLs ourself
@@ -147,12 +147,13 @@ class SoapClient extends \SoapClient
             );
         } else {
             $headers = array(
-               'Content-Type:' . $soapRequest->getContentType() . '; action="' . $soapAction . '"',
+                'Content-Type:' . $soapRequest->getContentType() . '; action="' . $soapAction . '"',
             );
         }
 
         $location = $soapRequest->getLocation();
         $content = $soapRequest->getContent();
+
         /*
          * Work around missing header/php://input access in PHP cli webserver by
          * setting headers additionally as GET parameters and SOAP request body
@@ -221,14 +222,18 @@ class SoapClient extends \SoapClient
      */
     public function __doRequest($request, $location, $action, $version, $oneWay = 0)
     {
+
         // wrap request data in SoapRequest object
         $soapRequest = SoapRequest::create($request, $location, $action, $version);
 
         // do actual SOAP request
         $soapResponse = $this->__doRequest2($soapRequest);
+        $xml = explode('\r\n', $soapResponse->getContent());
+        //print_r($xml);
 
+        $response = preg_replace( '/^(\x00\x00\xFE\xFF|\xFF\xFE\x00\x00|\xFE\xFF|\xFF\xFE|\xEF\xBB\xBF)/', "", $soapResponse->getContent() );
         // return SOAP response to ext/soap
-        return $soapResponse->getContent();
+        return $response;
     }
 
     /**
@@ -304,12 +309,12 @@ class SoapClient extends \SoapClient
     }
 
     /**
-    * Configure filter and type converter for SwA/MTOM.
-    *
-    * @param array &$options SOAP constructor options array.
-    *
-    * @return void
-    */
+     * Configure filter and type converter for SwA/MTOM.
+     *
+     * @param array &$options SOAP constructor options array.
+     *
+     * @return void
+     */
     private function configureMime(array &$options)
     {
         if (isset($options['attachment_type']) && Helper::ATTACHMENTS_TYPE_BASE64 !== $options['attachment_type']) {
@@ -334,11 +339,11 @@ class SoapClient extends \SoapClient
                 'type_name' => $converter->getTypeName(),
                 'type_ns'   => $converter->getTypeNamespace(),
                 'from_xml'  => function($input) use ($converter) {
-                    return $converter->convertXmlToPhp($input);
-                },
+                        return $converter->convertXmlToPhp($input);
+                    },
                 'to_xml'    => function($input) use ($converter) {
-                    return $converter->convertPhpToXml($input);
-                },
+                        return $converter->convertPhpToXml($input);
+                    },
             );
         }
     }
