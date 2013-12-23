@@ -24,6 +24,6 @@ $soap = new Soap($url, $options);
 $soap->peekMessages($username, $password, 50);
 
 //So it must be followed up by
-$xml = $soap->__getLastResponse();
+$xml = $soap->__getXml();
 
 ```
