@@ -1,5 +1,5 @@
 {
-    "name": "besimple/soap-client",
+    "name": "robcaw/soap-client",
     "type": "library",
     "description": "Build and consume SOAP Client based web services",
     "keywords": [ "soap", "soap-client" ],
