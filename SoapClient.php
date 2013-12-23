@@ -208,6 +208,7 @@ class SoapClient extends \SoapClient
         return $soapResponse;
     }
 
+
     /**
      * Custom request method to be able to modify the SOAP messages.
      * $oneWay parameter is not used at the moment.
@@ -228,12 +229,15 @@ class SoapClient extends \SoapClient
 
         // do actual SOAP request
         $soapResponse = $this->__doRequest2($soapRequest);
-        $xml = explode('\r\n', $soapResponse->getContent());
-        //print_r($xml);
 
-        $response = preg_replace( '/^(\x00\x00\xFE\xFF|\xFF\xFE\x00\x00|\xFE\xFF|\xFF\xFE|\xEF\xBB\xBF)/', "", $soapResponse->getContent() );
-        // return SOAP response to ext/soap
-        return $response;
+
+
+        return $soapResponse->getContent();
+    }
+
+    public function __getXml()
+    {
+        return $this->__getLastResponse();
     }
 
     /**
